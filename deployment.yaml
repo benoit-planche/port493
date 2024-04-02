@@ -1,0 +1,131 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: deploy-subjects
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: providers-subjects
+  template:
+    metadata:
+      labels:
+        app: providers-subjects
+    spec:
+      automountServiceAccountToken: false
+      containers:
+      - name: subject
+        image: fteychene/cloud-cadavre-exquis-provider:1.0-SNAPSHOT
+        ports:
+        - containerPort: 8080
+        env:
+          - name: REGISTER_URLS
+            value: "http://registers:8080"
+          - name: WORD_TYPE
+            value: SUBJECT
+        resources:
+          limits:
+            cpu: "1"
+            memory: "500Mi"
+
+---     
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: deploy-verbs
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: providers-verbs
+  template:
+    metadata:
+      labels:
+        app: providers-verbs
+    spec:
+      automountServiceAccountToken: false
+      containers:
+      - name: verb
+        image: fteychene/cloud-cadavre-exquis-provider:1.0-SNAPSHOT
+        ports:
+        - containerPort: 8080
+        env:
+          - name: REGISTER_URLS
+            value: "http://registers:8080"
+          - name: WORD_TYPE
+            value: VERB
+        resources:
+          limits:
+            cpu: "1"
+            memory: "500Mi"
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: deploy-adjectives
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: providers-adjectives
+  template:
+    metadata:
+      labels:
+        app: providers-adjectives
+    spec:
+      automountServiceAccountToken: false
+      containers:
+      - name: adjective
+        image: fteychene/cloud-cadavre-exquis-provider:1.0-SNAPSHOT
+        ports:
+        - containerPort: 8080
+        env:
+          - name: REGISTER_URLS
+            value: "http://registers:8080"
+          - name: WORD_TYPE
+            value: ADJECTIVE
+        resources:
+          limits:
+            cpu: "1"
+            memory: "500Mi"
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: service-subjects
+spec:
+  selector:
+    app: providers-subjects
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 8080
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: service-verbs
+spec:
+  selector:
+    app: providers-verbs
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 8080
+  
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: service-adjectives
+spec:
+  selector:
+    app: providers-adjectives
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 8080
+
