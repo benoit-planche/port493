@@ -63,3 +63,23 @@ resource "openstack_compute_instance_v2" "node3" {
     name = "Ext-Net" # Ajoute le composant réseau pour atteindre votre instance
   }
 }
+
+output "ip-master1" {
+  value = openstack_compute_instance_v2.master.access_ip_v4
+}
+
+output "ip-master2" {
+  value = openstack_compute_instance_v2.master2.access_ip_v4
+}
+
+output "ip-node1" {
+  value = openstack_compute_instance_v2.node1.access_ip_v4
+}
+
+output "ip-node2" {
+  value = openstack_compute_instance_v2.node2.access_ip_v4
+}
+
+output "ip-node3" {
+  value = openstack_compute_instance_v2.node3.access_ip_v4
+}
