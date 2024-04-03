@@ -1,0 +1,49 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: service-subjects
+spec:
+  selector:
+    app: providers-subjects
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 8080
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: service-verbs
+spec:
+  selector:
+    app: providers-verbs
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 8080
+  
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: service-adjectives
+spec:
+  selector:
+    app: providers-adjectives
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 8080
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: service-dispatcher
+spec:
+  selector:
+    app: dispatcher
+  ports:
+  - port: 80
+    targetPort: 8080

@@ -1,0 +1,31 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: dispatcher-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: dispatcher
+  template:
+    metadata:
+      labels:
+        app: dispatcher
+    spec:
+      automountServiceAccountToken: false
+      containers:
+      - name: dispatcher
+        image: fteychene/cloud-cadavre-exquis-dispatcher-bis:1.0-SNAPSHOT
+        ports:
+        - containerPort: 8080
+        resources:
+          limits:
+            cpu: "1"
+            memory: "500Mi"
+        env:
+        - name: SUBJECT_URL
+          value: "http://service-subjects"
+        - name: VERB_URL
+          value: "http://service-verbs"
+        - name: ADJECTIVE_URL
+          value: "http://service-adjectives"
