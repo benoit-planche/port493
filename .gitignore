@@ -34,3 +34,4 @@ kubeconf.yaml
 # Ignore CLI configuration files
 .terraformrc
 terraform.rc
+terraform/provider.tf
