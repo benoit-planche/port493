@@ -35,10 +35,10 @@ cd port493
 ```
 
 2. **Configurer Terraform :**
-- Assurez-vous que votre configuration Terraform est correctement configurée pour accéder aux API OVH. Créer une copie du fichier `./terraform/providers.example.tf` appelé `./terraform/providers.tf`. 
+- Assurez-vous que votre configuration Terraform est correctement configurée pour accéder aux API OVH. Créer une copie du fichier `./terraform/providers.tf.example` appelé `./terraform/providers.tf`. 
 ```bash
 cd ./terraform
-cp providers.example.tf providers.tf
+cp providers.tf.example providers.tf
 ```
 Utiliser les accès généré précédemment en renseignant les paramètres `application_key`, `application_secret`, `consumer_key` dans le fichier `./terraform/providers.tf`.
 
