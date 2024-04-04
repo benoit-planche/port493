@@ -11,7 +11,16 @@ Avant de commencer le processus de déploiement, assurez-vous que votre environn
 - Terraform (testé avec la version 1.7.3)
 - Ansible (testé avec la version 2.14.3)
 - Kubectl (testé avec la version 1.28.2)
-- Compte OVH avec les autorisations nécessaires pour créer et gérer des ressources
+- Avoir un compte OVH
+
+### Créer des accès API OVH
+Documentation utilisée : https://help.ovhcloud.com/csm/fr-public-cloud-compute-terraform?id=kb_article_view&sysparm_article=KB0050792
+
+1. Accédez à la page de génération des tokens API
+Lien : https://www.ovh.com/auth/?onsuccess=https%3A%2F%2Fwww.ovh.com%2Fauth%2Fapi%2FcreateToken%3FGET%3D%2F%2A%26POST%3D%2F%2A%26PUT%3D%2F%2A%26DELETE%3D%2F%2A
+
+2. Générez les tokens
+Renseignez les champs tels que `Application name` et `Application description`. Cliquez sur `Create` pour générer les tokens `Application key`, `Application secret` et `Consumer key`.
 
 ### Étapes de Déploiement
 
@@ -21,8 +30,7 @@ Suivez ces étapes pour déployer l'application Cadavre-Exquis :
 git clone https://github.com/benoit-planche/port493.git
 
 2. **Configurer Terraform :**
-- Assurez-vous que votre configuration Terraform est correctement configurée pour accéder aux API OVH. Utilisez les variables d'environnement ou configurez les fichiers Terraform en conséquence.
-- Assurez-vous que votre fichier `terraform/create-cluster.tf` est correctement configuré avec les ressources nécessaires pour déployer votre cluster Kubernetes sur OVH.
+- Assurez-vous que votre configuration Terraform est correctement configurée pour accéder aux API OVH. Utiliser les accès généré précédemment en renseignant les paramètres `application_key`, `application_secret`, `consumer_key` dans le fichier `./terraform/providers.tf`.
 
 3. **Déployer le Cluster Kubernetes avec Terraform :**
 cd port493/terraform
