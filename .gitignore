@@ -23,7 +23,7 @@ override.tf.json
 *_override.tf
 *_override.tf.json
 kubeconf.yaml
-providers.tf
+terraform/providers.tf
 .terraform.lock.hcl
 
 # Include override files you do wish to add to version control using negated pattern
@@ -35,3 +35,4 @@ providers.tf
 # Ignore CLI configuration files
 .terraformrc
 terraform.rc
+terraform/provider.tf
