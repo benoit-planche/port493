@@ -35,11 +35,17 @@ cd port493
 ```
 
 2. **Configurer Terraform :**
-- Assurez-vous que votre configuration Terraform est correctement configurée pour accéder aux API OVH. Utiliser les accès généré précédemment en renseignant les paramètres `application_key`, `application_secret`, `consumer_key` dans le fichier `./terraform/providers.tf`.
+- Assurez-vous que votre configuration Terraform est correctement configurée pour accéder aux API OVH. Créer une copie du fichier `./terraform/providers.example.tf` appelé `./terraform/providers.tf`. 
+```bash
+cd ./terraform
+cp providers.example.tf providers.tf
+```
+Utiliser les accès généré précédemment en renseignant les paramètres `application_key`, `application_secret`, `consumer_key` dans le fichier `./terraform/providers.tf`.
+
+Dans le fichier `create-cluster.tf`, dans la ressource `test_keypair`, l'attribut `public_key` permet de renseigner une clée ssh publique permettant de vous connecter en ssh aux différentes instances OVH créées. Veillez à utiliser une de vos clées ssh local. 
 
 3. **Déployer le Cluster Kubernetes avec Terraform :**
 ```bash
-cd ./terraform
 terraform init
 terraform apply
 ```
@@ -47,37 +53,64 @@ terraform apply
 Suivez les instructions et confirmez le déploiement lorsque Terraform le demande.
 
 4. **Installer k3s dans les Cluster déployé**
+
 a. Créer le fichier inventaire
--> Toutes les IP retournées par Terraform
+```bash
+cd ../k3s-ansible
+cat << EOT
+---
+k3s_cluster:
+  children:
+    server:
+      hosts:
+        {MASTER1_IP}:
+        {MASTER2_IP}:
+    agent:
+      hosts:
+        {WORKER1_IP}:
+        {WORKER2_IP}:
+        {WORKER3_IP}:
+
+  # Required Vars
+  vars:
+    ansible_port: 22
+    ansible_user: debian
+    k3s_version: v1.26.9+k3s1
+    token: "mytoken"  # Use ansible vault if you want to keep it secret
+    api_endpoint: "{{ hostvars[groups['server'][0]]['ansible_host'] | default(groups['server'][0]) }}"
+    extra_server_args: ""
+    extra_agent_args: ""
+    airgap_dir: "./airgap"
+    kubeconfig: "../../kubeconfig.yaml"
+EOT > ./inventory.yaml
+```
+
+Bien evidemment il faut remplacer `MASTER1_IP`, `MASTER2_IP`, `WORKER1_IP`, `WORKER2_IP`, `WORKER3_IP` par les adresses IP correspondantes dans la sortie du script terraform.
 
 b. Executer le script Ansible
 ```bash
-cd ../k3s-ansible
-ansible-playbook sites.yaml -i inventory
+ansible-playbook sites.yaml -i inventory.yaml
 ```
 
 5. **Déployer les Ressources Kubernetes :**
-a. Configurer kubctl
-Récupérer le fichier de configuration kubernetes créer par le script ansible pour accéder à distance à la gestion du cluster.
 
+a. Configurer kubctl
+```bash
+kubectl config use-context k3s-ansible --kubeconfig=kubeconfig.yaml
+```
 b. Déployer l'application via kubctl
 ```bash
-cd ../kubernetes
-kubectl apply -f deployment.yaml
-kubectl apply -f service.yaml
-kubectl apply -f dispatcher.yaml
-kubectl apply -f ingress.yaml
+kubectl --kubeconfig=kubeconfig.yaml apply -f ./kubernetes
 ```
 
 6. **Accéder à l'Application :**
-Une fois que toutes les ressources ont été déployées avec succès, utilisez la configuration de votre Ingress pour accéder à l'application. Assurez-vous que les règles de routage appropriées sont configurées dans votre infrastructure pour diriger le trafic vers l'application.
+Une fois que toutes les ressources ont été déployées avec succès, utilisez la configuration de l'Ingress pour accéder à l'application.
 
 ### Points d'Attention
 
 - Assurez-vous que les ressources Terraform sont correctement configurées pour déployer votre cluster Kubernetes sur OVH.
 - Vérifiez que les services Kubernetes nécessaires sont déployés et fonctionnent correctement.
 - Veillez à ce que les règles de routage de l'Ingress soient correctement configurées pour diriger le trafic vers l'application.
-- [Autres points d'attention spécifiques à votre application].
 
 ---
 
