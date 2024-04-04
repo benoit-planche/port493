@@ -29,25 +29,47 @@ Suivez ces étapes pour déployer l'application Cadavre-Exquis :
 1. **Cloner le Répertoire distant Git :**
 git clone https://github.com/benoit-planche/port493.git
 
+Pour la suite de la documentation, rendez-vous à la racine du projet git cloné.
+```bash
+cd port493
+```
+
 2. **Configurer Terraform :**
 - Assurez-vous que votre configuration Terraform est correctement configurée pour accéder aux API OVH. Utiliser les accès généré précédemment en renseignant les paramètres `application_key`, `application_secret`, `consumer_key` dans le fichier `./terraform/providers.tf`.
 
 3. **Déployer le Cluster Kubernetes avec Terraform :**
-cd port493/terraform
+```bash
+cd ./terraform
 terraform init
 terraform apply
+```
 
 Suivez les instructions et confirmez le déploiement lorsque Terraform le demande.
 
-4. **Déployer les Ressources Kubernetes :**
+4. **Installer k3s dans les Cluster déployé**
+a. Créer le fichier inventaire
+-> Toutes les IP retournées par Terraform
+
+b. Executer le script Ansible
+```bash
+cd ../k3s-ansible
+ansible-playbook sites.yaml -i inventory
+```
+
+5. **Déployer les Ressources Kubernetes :**
+a. Configurer kubctl
+Récupérer le fichier de configuration kubernetes créer par le script ansible pour accéder à distance à la gestion du cluster.
+
+b. Déployer l'application via kubctl
+```bash
 cd ../kubernetes
 kubectl apply -f deployment.yaml
 kubectl apply -f service.yaml
 kubectl apply -f dispatcher.yaml
 kubectl apply -f ingress.yaml
+```
 
-
-5. **Accéder à l'Application :**
+6. **Accéder à l'Application :**
 Une fois que toutes les ressources ont été déployées avec succès, utilisez la configuration de votre Ingress pour accéder à l'application. Assurez-vous que les règles de routage appropriées sont configurées dans votre infrastructure pour diriger le trafic vers l'application.
 
 ### Points d'Attention
