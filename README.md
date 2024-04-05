@@ -1,4 +1,4 @@
-**README - Déploiement de l'Application Cadavre-Exquis sur OVH**
+## Déploiement de l'application Cadavre-Exquis sur OVH
 
 Ce README détaille les étapes nécessaires pour déployer l'application Cadavre-Exquis sur l'infrastructure OVH en utilisant Terraform et Ansible pour la gestion des ressources et Kubernetes pour l'orchestration des conteneurs. Cadavre-Exquis est une application web fournie par M. Teychene.
 
@@ -13,60 +13,58 @@ Avant de commencer le processus de déploiement, assurez-vous que votre environn
 - Kubectl (testé avec la version 1.28.2)
 - Avoir un compte OVH
 
-# Installation 
+### Installation
 
-Pour créer les instances sur ovh et déployer les cluster kubernetes vous pouvez utiliser la commande suivante :
+#### Créer des accès API OVH
+Documentation utilisée : [Premiers pas avec les API OVHcloud](https://help.ovhcloud.com/csm/fr-api-getting-started-ovhcloud-api?id=kb_article_view&sysparm_article=KB0042789).
+
+1. Accédez à la page de génération des tokens API : [Créer des tokens API OVHcloud](https://www.ovh.com/auth/api/createToken).
+2. Renseignez les champs `Application name` et `Application description`. 
+3. Configurez les droits `GET` et `POST` avec l'annotation `/*`.
+4. liquez sur `Create` pour générer les tokens `Application key`, `Application secret` et `Consumer key`.
+
+#### Préparation de l'environnement
+
+1. **Clonez le Répertoire distant Git :**
+```bash
+git clone https://github.com/benoit-planche/port493.git
+```
+
+```bash
+cd port493
+```
+
+2. **Configurez Terraform :**
+- Créez le fichier `./providers.tf` depuis `./providers.tf.example`. 
+```bash
+cd ./terraform
+cp providers.tf.example providers.tf
+```
+- Utilisez les accès générés précédemment en renseignant les paramètres `application_key`, `application_secret`, `consumer_key` dans le fichier `./providers.tf`.
+
+### Installation 
+
+1. **Avec le script magique**
+Nous avons développé un script bash qui permet de créer les instances sur ovh et de déployer les clusters Kubernetes. 
+**Attention** : Avant de l'utiliser, veillez à créer un fichier `.env` en utilisant la structure du fichier `.env.template` et à saisir les chemins relatifs vers vos clés SSH. 
+Une fois cela fait, éxecutez le script :
 
 ```bash
 ./setup.sh
 ```
 
-ou suivre la docummentation suivante :
+2. **Sans le script magique**
 
-# Documentation d'installation  
-
-### Créer des accès API OVH
-Documentation utilisée : https://help.ovhcloud.com/csm/fr-public-cloud-compute-terraform?id=kb_article_view&sysparm_article=KB0050792
-
-1. Accédez à la page de génération des tokens API
-Lien : https://www.ovh.com/auth/?onsuccess=https%3A%2F%2Fwww.ovh.com%2Fauth%2Fapi%2FcreateToken%3FGET%3D%2F%2A%26POST%3D%2F%2A%26PUT%3D%2F%2A%26DELETE%3D%2F%2A
-
-2. Générez les tokens
-Renseignez les champs tels que `Application name` et `Application description`. Cliquez sur `Create` pour générer les tokens `Application key`, `Application secret` et `Consumer key`.
-
-### Étapes de Déploiement
-
-Suivez ces étapes pour déployer l'application Cadavre-Exquis :
-
-1. **Cloner le Répertoire distant Git :**
-git clone https://github.com/benoit-planche/port493.git
-
-Pour la suite de la documentation, rendez-vous à la racine du projet git cloné.
-```bash
-cd port493
-```
-
-2. **Configurer Terraform :**
-- Assurez-vous que votre configuration Terraform est correctement configurée pour accéder aux API OVH. Créer une copie du fichier `./terraform/providers.tf.example` appelé `./terraform/providers.tf`. 
-```bash
-cd ./terraform
-cp providers.tf.example providers.tf
-```
-Utiliser les accès généré précédemment en renseignant les paramètres `application_key`, `application_secret`, `consumer_key` dans le fichier `./terraform/providers.tf`.
-
-Dans le fichier `create-cluster.tf`, dans la ressource `test_keypair`, l'attribut `public_key` permet de renseigner une clée ssh publique permettant de vous connecter en ssh aux différentes instances OVH créées. Veillez à utiliser une de vos clées ssh local. 
-
-3. **Déployer le Cluster Kubernetes avec Terraform :**
+a. Déployez le Cluster Kubernetes avec Terraform :
 ```bash
 terraform init
-terraform apply
+terraform apply -auto-approve -var "ssh_key=$HOME/.ssh/<key.pub>"
 ```
+**Attention** : Veillez à remplacer `<key.pub>` par une de vos clés SSH publiques.
 
-Suivez les instructions et confirmez le déploiement lorsque Terraform le demande.
+b. Installez k3s sur les machines déployées
 
-4. **Installer k3s dans les Cluster déployé**
-
-a. Créer le fichier inventaire
+i. Créez le fichier inventaire
 ```bash
 cd ../k3s-ansible
 cat << EOT
@@ -97,25 +95,26 @@ k3s_cluster:
 EOT > ./inventory.yaml
 ```
 
-Bien evidemment il faut remplacer `MASTER1_IP`, `MASTER2_IP`, `WORKER1_IP`, `WORKER2_IP`, `WORKER3_IP` par les adresses IP correspondantes dans la sortie du script terraform.
+**Attention** : Veillez à remplacer `MASTER1_IP`, `MASTER2_IP`, `WORKER1_IP`, `WORKER2_IP`, `WORKER3_IP` par les adresses IP correspondantes dans la sortie du script terraform.
 
-b. Executer le script Ansible
+ii. Executez le script Ansible
 ```bash
-ansible-playbook sites.yaml -i inventory.yaml
+ansible-playbook -i inventory.yml playbook/site.yml --key-file "$HOME/.ssh/<key>"
 ```
+**Attention** : Veillez à remplacer `<key>` par la clé SSH privée en lien avec la clé publique utilisée au _2.a_.
 
-5. **Déployer les Ressources Kubernetes :**
+c. Déployez les Ressources Kubernetes :
 
-a. Configurer kubctl
+i. Configurez kubctl
 ```bash
 kubectl config use-context k3s-ansible --kubeconfig=kubeconfig.yaml
 ```
-b. Déployer l'application via kubctl
+ii. Déployez l'application via kubctl
 ```bash
 kubectl --kubeconfig=kubeconfig.yaml apply -f ./kubernetes
 ```
 
-6. **Accéder à l'Application :**
+d. Accédez à l'application :
 Une fois que toutes les ressources ont été déployées avec succès, utilisez la configuration de l'Ingress pour accéder à l'application.
 
 ### Points d'Attention
@@ -127,3 +126,6 @@ Une fois que toutes les ressources ont été déployées avec succès, utilisez 
 ---
 
 En suivant ces étapes, vous devriez pouvoir déployer l'application Port493 avec succès sur l'infrastructure OVH en utilisant Terraform pour la gestion des ressources. En cas de problèmes ou de questions, n'hésitez pas à consulter la documentation supplémentaire ou à contacter l'équipe de développement.
+
+### Références
+Nous avons utilisé un projet Ansible existant sur GitHub pour déployer les configuration k3s sur nos machines OVH : [k3s-ansible](https://github.com/k3s-io/k3s-ansible.git).
