@@ -13,6 +13,18 @@ Avant de commencer le processus de déploiement, assurez-vous que votre environn
 - Kubectl (testé avec la version 1.28.2)
 - Avoir un compte OVH
 
+# Installation 
+
+Pour créer les instances sur ovh et déployer les cluster kubernetes vous pouvez utiliser la commande suivante :
+
+```bash
+./setup.sh
+```
+
+ou suivre la docummentation suivante :
+
+# Documentation d'installation  
+
 ### Créer des accès API OVH
 Documentation utilisée : https://help.ovhcloud.com/csm/fr-public-cloud-compute-terraform?id=kb_article_view&sysparm_article=KB0050792
 
