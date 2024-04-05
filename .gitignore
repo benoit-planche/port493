@@ -36,3 +36,4 @@ terraform/providers.tf
 .terraformrc
 terraform.rc
 terraform/provider.tf
+.env

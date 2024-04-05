@@ -1,7 +1,7 @@
 resource "openstack_compute_keypair_v2" "test_keypair" {
   provider   = openstack.ovh             # Nom du fournisseur déclaré dans provider.tf
   name       = "ssh-port493"            # Nom de la clé SSH à utiliser pour la création
-  public_key = file("~/.ssh/id_ed25519_DO.pub") # Chemin vers votre clé SSH précédemment générée
+  public_key = file(var.ssh_key) # Chemin vers votre clé SSH précédemment générée
 }
 
 resource "openstack_compute_instance_v2" "master" {
