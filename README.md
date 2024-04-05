@@ -15,13 +15,13 @@ Avant de commencer le processus de déploiement, assurez-vous que votre environn
 
 ### Installation
 
-#### Créer des accès API OVH
+#### Création des accès API OVH
 Documentation utilisée : [Premiers pas avec les API OVHcloud](https://help.ovhcloud.com/csm/fr-api-getting-started-ovhcloud-api?id=kb_article_view&sysparm_article=KB0042789).
 
 1. Accédez à la page de génération des tokens API : [Créer des tokens API OVHcloud](https://www.ovh.com/auth/api/createToken).
 2. Renseignez les champs `Application name` et `Application description`. 
 3. Configurez les droits `GET` et `POST` avec l'annotation `/*`.
-4. liquez sur `Create` pour générer les tokens `Application key`, `Application secret` et `Consumer key`.
+4. Cliquez sur `Create` pour générer les tokens `Application key`, `Application secret` et `Consumer key`.
 
 #### Préparation de l'environnement
 
@@ -46,8 +46,8 @@ cp providers.tf.example providers.tf
 
 1. **Avec le script magique**
 Nous avons développé un script bash qui permet de créer les instances sur ovh et de déployer les clusters Kubernetes. 
-**Attention** : Avant de l'utiliser, veillez à créer un fichier `.env` en utilisant la structure du fichier `.env.template` et à saisir les chemins relatifs vers vos clés SSH. 
-Une fois cela fait, éxecutez le script :
+**Attention** : Avant de l'utiliser, veillez à créer un fichier `.env` en utilisant la structure du fichier `.env.template` et à saisir les chemins relatifs vers vos clés ssh. 
+Une fois cela fait, exécutez le script :
 
 ```bash
 ./setup.sh
@@ -55,12 +55,12 @@ Une fois cela fait, éxecutez le script :
 
 2. **Sans le script magique**
 
-a. Déployez le Cluster Kubernetes avec Terraform :
+a. Déployez le cluster Kubernetes avec Terraform :
 ```bash
 terraform init
 terraform apply -auto-approve -var "ssh_key=$HOME/.ssh/<key.pub>"
 ```
-**Attention** : Veillez à remplacer `<key.pub>` par une de vos clés SSH publiques.
+**Attention** : Veillez à remplacer `<key.pub>` par une de vos clés ssh publiques.
 
 b. Installez k3s sur les machines déployées
 
@@ -95,15 +95,15 @@ k3s_cluster:
 EOT > ./inventory.yaml
 ```
 
-**Attention** : Veillez à remplacer `MASTER1_IP`, `MASTER2_IP`, `WORKER1_IP`, `WORKER2_IP`, `WORKER3_IP` par les adresses IP correspondantes dans la sortie du script terraform.
+**Attention** : Veillez à remplacer `MASTER1_IP`, `MASTER2_IP`, `WORKER1_IP`, `WORKER2_IP`, `WORKER3_IP` par les adresses IP correspondantes dans la sortie du script Terraform.
 
-ii. Executez le script Ansible
+ii. Exécutez le script Ansible
 ```bash
 ansible-playbook -i inventory.yml playbook/site.yml --key-file "$HOME/.ssh/<key>"
 ```
-**Attention** : Veillez à remplacer `<key>` par la clé SSH privée en lien avec la clé publique utilisée au _2.a_.
+**Attention** : Veillez à remplacer `<key>` par la clé ssh privée en lien avec la clé publique utilisée au _2.a_.
 
-c. Déployez les Ressources Kubernetes :
+c. Déployez les ressources Kubernetes :
 
 i. Configurez kubctl
 ```bash
@@ -128,4 +128,4 @@ Une fois que toutes les ressources ont été déployées avec succès, utilisez 
 En suivant ces étapes, vous devriez pouvoir déployer l'application Port493 avec succès sur l'infrastructure OVH en utilisant Terraform pour la gestion des ressources. En cas de problèmes ou de questions, n'hésitez pas à consulter la documentation supplémentaire ou à contacter l'équipe de développement.
 
 ### Références
-Nous avons utilisé un projet Ansible existant sur GitHub pour déployer les configuration k3s sur nos machines OVH : [k3s-ansible](https://github.com/k3s-io/k3s-ansible.git).
+Nous avons utilisé un projet Ansible existant sur GitHub pour déployer les configurations k3s sur nos machines OVH : [k3s-ansible](https://github.com/k3s-io/k3s-ansible.git).
