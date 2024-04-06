@@ -23,6 +23,21 @@ Documentation utilisée : [Premiers pas avec les API OVHcloud](https://help.ovhc
 3. Configurez les droits `GET` et `POST` avec l'annotation `/*`.
 4. Cliquez sur `Create` pour générer les tokens `Application key`, `Application secret` et `Consumer key`.
 
+#### Création de l'utilisateur
+Documentation utilisée : [Création et suppression d’utilisateurs OpenStack](https://help.ovhcloud.com/csm/fr-public-cloud-compute-openstack-users?id=kb_article_view&sysparm_article=KB0050630).
+
+1. Accédez à la page de création d'utilisateur : [Créer des Users & Roles](https://www.ovh.com/manager/#/public-cloud/pci/projects/fe25b8b0061d417189eadfd78e0b979d/users).
+2. Cliquer sur ```+ Ajouter un utilisateur``` et renseigner un descriptif à l'utilisateur. 
+3. Donner tout les droits et cliquer sur ```Valider```.
+4. Récuper votre username et votre password.
+5. Retrouver votre utilisateur et cliquer sur les ```...``` puis sur ```Télécharger le fichier RC d'OpenStack```.
+6. Une fois le script openrc.sh téléchargé, lancer le :
+```bash
+chmod +x ./chemin/vers/openrc.sh
+source ./chemin/vers/openrc.sh
+```
+
+
 #### Préparation de l'environnement
 
 1. **Clonez le Répertoire distant Git :**
